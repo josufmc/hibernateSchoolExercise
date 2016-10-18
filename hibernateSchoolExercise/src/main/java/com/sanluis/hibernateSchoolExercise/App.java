@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Set;
 
 import javax.persistence.EntityManager;
+import javax.persistence.Query;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
@@ -58,8 +59,36 @@ public class App {
 		List<Course> courseList = em.createQuery(criteriaCourse).getResultList();
 		
 		// Obtenemos la nota media
+		Query q = em.createQuery("select avg(s.mark) from StudentCourse s");
+		Double mark = (Double) q.getSingleResult();
+		
+		// Obtenemos el año que más nota ha obtenido
+		Query q2 = em.createQuery("select s.year from StudentCourse s WHERE s.mark = (SELECT max(s2.mark) from StudentCourse s2)");
+		q2.setMaxResults(1);
+		Integer year = (Integer) q2.getSingleResult();
 		
 		s.getTransaction().commit();
+		
+		
+		// Creamos un curso
+		Course newCourse = new Course();
+		newCourse.setCourse("Curso nuevo!");
+		s.persist(newCourse);
+		s.flush();
+		s.getTransaction().commit();
+		
+		// Editamos el curso
+		newCourse.setCourse("Curso2!");
+		s.save(newCourse);
+		s.flush();
+		s.getTransaction().commit();
+		
+		// Borramos el curso
+		s.remove(newCourse);
+		s.flush();
+		s.getTransaction().commit();
+		
+		
 		
 		System.out.println("\r\n--STUDENTS--");
 		for(Student student : studentList){
@@ -79,6 +108,11 @@ public class App {
 			}
 		}
 		
+		System.out.println("\r\n--AVG Mark--");
+		System.out.println(mark);
+		
+		System.out.println("\r\n--Year with optimal mark--");
+		System.out.println(year);
 		
 		
 		System.out.println("OK!");
