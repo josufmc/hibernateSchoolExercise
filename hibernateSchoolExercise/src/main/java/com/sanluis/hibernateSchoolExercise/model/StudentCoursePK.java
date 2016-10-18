@@ -11,10 +11,10 @@ public class StudentCoursePK implements Serializable{
 	
 	private static final long serialVersionUID = 6764088904472411903L;
 	
-	@Column(name="students_id")
+	@Column(name = "students_id")
 	private Integer students_id;
 	
-	@Column(name="courses_id")
+	@Column(name = "courses_id")
 	private Integer courses_id;
 
 	public Integer getStudents_id() {

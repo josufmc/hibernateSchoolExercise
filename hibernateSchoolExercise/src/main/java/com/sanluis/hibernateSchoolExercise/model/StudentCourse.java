@@ -3,14 +3,27 @@ package com.sanluis.hibernateSchoolExercise.model;
 import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.MapsId;
 import javax.persistence.Table;
 
 @Entity
-@Table(name="courses")
+@Table(name="students_courses")
 public class StudentCourse {
 	
 	@EmbeddedId
     private StudentCoursePK studentCoursePK;
+	
+	@ManyToOne
+    @MapsId("students_id")
+    @JoinColumn(name = "students_id")
+	private Student student;
+	
+	@ManyToOne
+    @MapsId("courses_id")
+    @JoinColumn(name = "courses_id")
+	private Course course;
 	
 	@Column(name="mark")
 	private Integer mark;
@@ -40,6 +53,22 @@ public class StudentCourse {
 
 	public void setYear(Integer year) {
 		this.year = year;
+	}
+
+	public Student getStudent() {
+		return student;
+	}
+
+	public void setStudent(Student student) {
+		this.student = student;
+	}
+
+	public Course getCourse() {
+		return course;
+	}
+
+	public void setCourse(Course course) {
+		this.course = course;
 	}
 
 	
