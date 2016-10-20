@@ -66,29 +66,32 @@ public class App {
 		Query q2 = em.createQuery("select s.year from StudentCourse s WHERE s.mark = (SELECT max(s2.mark) from StudentCourse s2)");
 		q2.setMaxResults(1);
 		Integer year = (Integer) q2.getSingleResult();
-		
 		s.getTransaction().commit();
 		
 		
 		// Creamos un curso
+		s = sf.getCurrentSession();
+		s.beginTransaction();
 		Course newCourse = new Course();
 		newCourse.setCourse("Curso nuevo!");
-		s.persist(newCourse);
-		s.flush();
-		s.getTransaction().commit();
-		
-		// Editamos el curso
-		newCourse.setCourse("Curso2!");
 		s.save(newCourse);
 		s.flush();
 		s.getTransaction().commit();
 		
-		// Borramos el curso
-		s.remove(newCourse);
+		// Editamos el curso
+		s = sf.getCurrentSession();
+		s.beginTransaction();
+		newCourse.setCourse("Curso9!");
+		s.saveOrUpdate(newCourse);
 		s.flush();
 		s.getTransaction().commit();
 		
-		
+		// Borramos el curso
+		s = sf.getCurrentSession();
+		s.beginTransaction();
+		s.remove(newCourse);
+		s.flush();
+		s.getTransaction().commit();
 		
 		System.out.println("\r\n--STUDENTS--");
 		for(Student student : studentList){
