@@ -7,6 +7,8 @@ import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Path;
+import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
 import org.hibernate.Session;
@@ -14,6 +16,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 
 import com.sanluis.hibernateSchoolExercise.model.Course;
+import com.sanluis.hibernateSchoolExercise.model.IntegerWrapper;
 import com.sanluis.hibernateSchoolExercise.model.Student;
 import com.sanluis.hibernateSchoolExercise.model.StudentCourse;
 
@@ -58,6 +61,7 @@ public class App {
 		criteriaCourse.select(rootCourse);
 		List<Course> courseList = em.createQuery(criteriaCourse).getResultList();
 		
+		/*
 		// Obtenemos la nota media
 		Query q = em.createQuery("select avg(s.mark) from StudentCourse s");
 		Double mark = (Double) q.getSingleResult();
@@ -66,8 +70,22 @@ public class App {
 		Query q2 = em.createQuery("select s.year from StudentCourse s WHERE s.mark = (SELECT max(s2.mark) from StudentCourse s2)");
 		q2.setMaxResults(1);
 		Integer year = (Integer) q2.getSingleResult();
-		s.getTransaction().commit();
+		*/
 		
+		CriteriaQuery<IntegerWrapper> criteriaInt = builder.createQuery(IntegerWrapper.class);
+		// PASO 2: Configurar la clausula FROM
+		Root<StudentCourse> root = criteriaInt.from(StudentCourse.class);
+		Path<Integer> year = root.get("year");
+		criteriaInt.select(builder.max(builder.construct(IntegerWrapper.class, year)));
+		//Predicate tituloB = builder.like(root.get("titulo"), "%b%");
+		//criteriaInt.where(tituloB);
+		List<IntegerWrapper> integerList = em.createQuery(criteriaInt).getResultList();
+		
+		// Obtenemos la nota media (B)
+		
+		// Obtenemos el año que más nota ha obtenido (B)
+		
+		s.getTransaction().commit();
 		
 		// Creamos un curso
 		s = sf.getCurrentSession();
@@ -111,11 +129,17 @@ public class App {
 			}
 		}
 		
+		
+		System.out.println("\r\n--YEARS--");
+		for(IntegerWrapper integ : integerList){
+			System.out.println(integ.getValue());
+		}
+		
 		System.out.println("\r\n--AVG Mark--");
-		System.out.println(mark);
+		//System.out.println(mark);
 		
 		System.out.println("\r\n--Year with optimal mark--");
-		System.out.println(year);
+		//System.out.println(year);
 		
 		
 		System.out.println("OK!");
